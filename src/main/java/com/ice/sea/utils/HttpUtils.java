@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * OKHTTP工具类
@@ -14,7 +15,11 @@ import java.util.Map;
 @Slf4j
 public class HttpUtils {
 
-    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final ConnectionPool cp = new ConnectionPool(10, 5, TimeUnit.MINUTES);
+
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+            .connectionPool(cp)
+            .build();
 
     /**
      * GET请求
