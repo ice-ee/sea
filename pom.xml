@@ -30,6 +30,13 @@
         <java.version>21</java.version>
     </properties>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.github.mrmike/ok2curl -->
+        <dependency>
+            <groupId>com.github.mrmike</groupId>
+            <artifactId>ok2curl</artifactId>
+            <version>0.4.5</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
