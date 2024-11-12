@@ -28,6 +28,8 @@ public class HttpUtils {
             .build();
 
     private static final String LOG_FORMAT_EXCLUDE_RESULT = "{}-{}-附加信息:{}=>请求:{}";
+    private static final String LOG_FORMAT_ERROR = "{}-{}-附加信息:{}=>请求:{}";
+
     private static final String LOG_FORMAT = "{}-{}-附加信息:{}=>请求:{},响应:{},响应结果:{}";
 
     /**
@@ -138,22 +140,20 @@ public class HttpUtils {
      * @return String
      */
     private static String getResult(Request request, String tag, String tagDescp, Map<String, Object> extraInfoMap, boolean showResult) {
-        Response response = null;
         String result = null;
-        try {
-            response = CLIENT.newCall(request).execute();
+        try (Response response = CLIENT.newCall(request).execute()) {
             result = response.body().string();
             if (response.isSuccessful()) {
                 if (showResult) {
-                    printInfoLog(tag, tagDescp, extraInfoMap, request, response, result);
+                    log.info(LOG_FORMAT, tag, tagDescp, extraInfoMap, request, response, result);
                 } else {
                     log.info(LOG_FORMAT_EXCLUDE_RESULT, tag, tagDescp, extraInfoMap, request);
                 }
             } else {
-                printErrorLog(tag, tagDescp, extraInfoMap, request, response, result);
+                log.error(LOG_FORMAT, tag, tagDescp, extraInfoMap, request, response, result);
             }
         } catch (Exception e) {
-            printExceptionLog(tag, tagDescp, extraInfoMap, request, response, result, e);
+            log.error(LOG_FORMAT_ERROR, tag, tagDescp, extraInfoMap, request, e);
         }
         return result;
     }
@@ -180,48 +180,5 @@ public class HttpUtils {
                 // ignore
         }
         return builder.build();
-    }
-
-    /**
-     * print info log
-     *
-     * @param tag tag
-     * @param tagDescp tagDescp
-     * @param extraInfoMap extraInfoMap
-     * @param request request
-     * @param response response
-     * @param result result
-     */
-    private static void printInfoLog(String tag, String tagDescp, Map<String, Object> extraInfoMap, Request request, Response response, String result) {
-        log.info(LOG_FORMAT, tag, tagDescp, extraInfoMap, request, response, result);
-    }
-
-    /**
-     * print error log
-     *
-     * @param tag tag
-     * @param tagDescp tagDescp
-     * @param extraInfoMap extraInfoMap
-     * @param request request
-     * @param response response
-     * @param result result
-     */
-    private static void printErrorLog(String tag, String tagDescp, Map<String, Object> extraInfoMap, Request request, Response response, String result) {
-        log.error(LOG_FORMAT, tag, tagDescp, extraInfoMap, request, response, result);
-    }
-
-    /**
-     * print exception log
-     *
-     * @param tag tag
-     * @param tagDescp tagDescp
-     * @param extraInfoMap extraInfoMap
-     * @param request request
-     * @param response response
-     * @param result result
-     * @param e e
-     */
-    private static void printExceptionLog(String tag, String tagDescp, Map<String, Object> extraInfoMap, Request request, Response response, String result, Exception e) {
-        log.error(LOG_FORMAT, tag, tagDescp, extraInfoMap, request, response, result, e);
     }
 }
